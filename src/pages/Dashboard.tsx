@@ -196,6 +196,72 @@ export default function Dashboard() {
             </p>
           </button>
 
+          <button
+            onClick={() => navigate("/upload")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-cyan-500 transition-all duration-300"
+          >
+            <Upload className="text-cyan-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Upload Documents</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Upload new corpus documents.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/add-record")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 transition-all duration-300"
+          >
+            <PlusCircle className="text-emerald-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Add Record</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Create a new corpus record.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/ai-summary")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-pink-500 transition-all duration-300"
+          >
+            <Sparkles className="text-pink-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">AI Summary</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+                Generate AI-powered summaries.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/analytics")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-indigo-500 transition-all duration-300"
+          >
+            <BarChart3 className="text-indigo-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Analytics</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              View analytics and statistics.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/contributors")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-yellow-500 transition-all duration-300"
+          >
+            <Users className="text-yellow-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Contributors</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              View project contributors.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/server-health")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-red-500 transition-all duration-300"
+          >
+            <Activity className="text-red-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Server Health</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Check backend server status.
+            </p>
+          </button>
+
         </div>
       </div>
 
