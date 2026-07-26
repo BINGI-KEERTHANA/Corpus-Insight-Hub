@@ -33,10 +33,10 @@ export default function Navbar() {
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">
-          LexiHub
+          Corpus Insight Hub
         </h1>
         <p className="text-sm text-gray-500">
-          Explore and manage corpus resources
+          Manage, explore and analyze corpus resources from one place.
         </p>
       </div>
 

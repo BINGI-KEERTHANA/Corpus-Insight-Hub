@@ -76,15 +76,15 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-100 p-8">
 
     {/* Header */}
-  <div className="mb-8">
-    <h1 className="text-3xl font-bold text-gray-800">
-      Dashboard
-    </h1>
+    <div className="mb-8">
+      <h1 className="text-3xl font-bold text-gray-800">
+        Welcome, {user?.name ?? "User"} 👋
+      </h1>
 
-    <p className="mt-2 text-gray-500">
-      Manage and explore corpus resources efficiently.
-    </p>
-  </div>
+      <p className="mt-2 text-gray-500">
+        Manage, explore, and analyze corpus resources from one place.
+      </p>
+    </div>
 
       {/* User Card */}
       {user && (
