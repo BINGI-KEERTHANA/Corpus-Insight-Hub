@@ -12,7 +12,6 @@ import SearchPage from "../pages/Search/Search";
 import Profile from "../pages/Profile/Profile";
 import Languages from "../pages/Languages";
 import Categories from "../pages/Categories";
-import Events from "../pages/Events";
 import RecordDetails from "../pages/RecordDetails";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -89,16 +88,6 @@ export default function AppRoutes() {
     <ProtectedRoute>
       <Layout>
         <Categories />
-      </Layout>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/events"
-  element={
-    <ProtectedRoute>
-      <Layout>
-        <Events />
       </Layout>
     </ProtectedRoute>
   }

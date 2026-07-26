@@ -25,7 +25,6 @@ export default function Dashboard() {
   const [totalRecords, setTotalRecords] = useState(0);
   const [totalLanguages, setTotalLanguages] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
-  const [totalEvents, setTotalEvents] = useState<string | number>("N/A");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -38,14 +37,6 @@ export default function Dashboard() {
         setTotalLanguages(languagesResponse.data.length);
         const categoriesResponse = await api.get("/api/v1/categories");
         setTotalCategories(categoriesResponse.data.length);
-        try{
-        const eventsResponse = await api.get("/api/v1/events");
-        setTotalEvents(eventsResponse.data.length);
-      } 
-      catch {
-        console.log("Events API not accessible");
-        setTotalEvents("N/A");
-      }
     }
       catch (error) {
         console.error("Failed to fetch user:", error);
@@ -73,12 +64,6 @@ export default function Dashboard() {
     value: totalCategories,
     icon: <Folder size={28} />,
     color: "bg-orange-500",
-  },
-  {
-    title: "Events",
-    value: totalEvents,
-    icon: <CalendarDays size={28} />,
-    color: "bg-purple-600",
   },
 ];
 

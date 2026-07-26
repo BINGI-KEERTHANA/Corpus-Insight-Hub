@@ -53,12 +53,6 @@ export default function Sidebar() {
             </Link>
           </li>
 
-          <li>
-            <Link to="/events" className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800">
-              <Calendar size={20} />
-              Events
-            </Link>
-          </li>
 
           <li>
             <Link to="/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800">
