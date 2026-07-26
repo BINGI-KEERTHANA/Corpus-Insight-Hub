@@ -13,6 +13,12 @@ import Profile from "../pages/Profile/Profile";
 import Languages from "../pages/Languages";
 import Categories from "../pages/Categories";
 import RecordDetails from "../pages/RecordDetails";
+import UploadDocuments from "../pages/UploadDocuments/UploadDocuments";
+import AddRecord from "../pages/AddRecord/AddRecord";
+import Analytics from "../pages/Analytics/Analytics";
+import Contributors from "../pages/Contributors/Contributors";
+import AISummary from "../pages/AISummary/AISummary";
+import ServerHealth from "../pages/ServerHealth/ServerHealth";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("access_token");
@@ -98,6 +104,26 @@ export default function AppRoutes() {
     <ProtectedRoute>
       <Layout>
         <RecordDetails />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/upload"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <UploadDocuments />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add-record"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <AddRecord />
       </Layout>
     </ProtectedRoute>
   }

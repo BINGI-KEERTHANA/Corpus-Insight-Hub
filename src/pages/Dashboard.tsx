@@ -3,10 +3,15 @@ import {
   Database,
   Languages,
   Folder,
-  CalendarDays,
   Search,
   FileText,
   User,
+  Upload,
+  PlusCircle,
+  BarChart3,
+  Users,
+  Sparkles,
+  Activity,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";

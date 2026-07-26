@@ -5,15 +5,20 @@ import {
   FileText,
   Languages,
   Folder,
-  Calendar,
   User,
+  Upload,
+  PlusCircle,
+  BarChart3,
+  Users,
+  Sparkles,
+  Activity,
 } from "lucide-react";
 
 export default function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-slate-900 text-white flex flex-col shadow-lg">
       <div className="p-6 text-2xl font-bold border-b border-slate-700">
-        🧠 LexiHub
+        🧠 Corpus Insight Hub
       </div>
 
       <nav className="flex-1 p-4">
@@ -53,7 +58,64 @@ export default function Sidebar() {
             </Link>
           </li>
 
+          <li>
+            <Link
+              to="/upload"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+              <Upload size={20} />
+              Upload Documents
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/add-record"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+              <PlusCircle size={20} />
+              Add Record
+            </Link>
+          </li> 
 
+          <li>
+            <Link
+              to="/analytics"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+              <BarChart3 size={20} />
+              Analytics
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/contributors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+              <Users size={20} />
+              Contributors
+            </Link>
+          </li>
+
+          <li>
+              <Link
+                to="/ai-summary"
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+              >
+                <Sparkles size={20} />
+                AI Summary
+              </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/server-health"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+              <Activity size={20} />
+              Server Health
+            </Link>
+          </li>
           <li>
             <Link to="/profile" className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800">
               <User size={20} />
