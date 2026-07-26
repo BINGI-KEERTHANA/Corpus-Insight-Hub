@@ -128,6 +128,16 @@ export default function AppRoutes() {
     </ProtectedRoute>
   }
 />
+<Route
+  path="/ai-summary"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <AISummary />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
 </Routes>
 
 </BrowserRouter>
