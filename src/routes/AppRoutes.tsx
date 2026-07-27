@@ -128,6 +128,51 @@ export default function AppRoutes() {
     </ProtectedRoute>
   }
 />
+
+<Route
+  path="/analytics"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <Analytics />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/contributors"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <Contributors />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/ai-summary"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <AISummary />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/server-health"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <ServerHealth />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+
 </Routes>
 
 </BrowserRouter>
