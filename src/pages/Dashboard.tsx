@@ -3,10 +3,15 @@ import {
   Database,
   Languages,
   Folder,
-  CalendarDays,
   Search,
   FileText,
   User,
+  Upload,
+  PlusCircle,
+  BarChart3,
+  Users,
+  Sparkles,
+  Activity,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -25,7 +30,6 @@ export default function Dashboard() {
   const [totalRecords, setTotalRecords] = useState(0);
   const [totalLanguages, setTotalLanguages] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
-  const [totalEvents, setTotalEvents] = useState<string | number>("N/A");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -38,14 +42,6 @@ export default function Dashboard() {
         setTotalLanguages(languagesResponse.data.length);
         const categoriesResponse = await api.get("/api/v1/categories");
         setTotalCategories(categoriesResponse.data.length);
-        try{
-        const eventsResponse = await api.get("/api/v1/events");
-        setTotalEvents(eventsResponse.data.length);
-      } 
-      catch {
-        console.log("Events API not accessible");
-        setTotalEvents("N/A");
-      }
     }
       catch (error) {
         console.error("Failed to fetch user:", error);
@@ -74,27 +70,21 @@ export default function Dashboard() {
     icon: <Folder size={28} />,
     color: "bg-orange-500",
   },
-  {
-    title: "Events",
-    value: totalEvents,
-    icon: <CalendarDays size={28} />,
-    color: "bg-purple-600",
-  },
 ];
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
 
     {/* Header */}
-  <div className="mb-8">
-    <h1 className="text-3xl font-bold text-gray-800">
-      Dashboard
-    </h1>
+    <div className="mb-8">
+      <h1 className="text-3xl font-bold text-gray-800">
+        Welcome, {user?.name ?? "User"} 👋
+      </h1>
 
-    <p className="mt-2 text-gray-500">
-      Manage and explore corpus resources efficiently.
-    </p>
-  </div>
+      <p className="mt-2 text-gray-500">
+        Manage, explore, and analyze corpus resources from one place.
+      </p>
+    </div>
 
       {/* User Card */}
       {user && (
@@ -203,6 +193,72 @@ export default function Dashboard() {
             <h3 className="font-bold text-lg">Profile</h3>
             <p className="text-gray-500 mt-2 text-sm">
               View your profile details.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/upload")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-cyan-500 transition-all duration-300"
+          >
+            <Upload className="text-cyan-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Upload Documents</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Upload new corpus documents.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/add-record")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-emerald-500 transition-all duration-300"
+          >
+            <PlusCircle className="text-emerald-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Add Record</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Create a new corpus record.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/ai-summary")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-pink-500 transition-all duration-300"
+          >
+            <Sparkles className="text-pink-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">AI Summary</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+                Generate AI-powered summaries.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/analytics")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-indigo-500 transition-all duration-300"
+          >
+            <BarChart3 className="text-indigo-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Analytics</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              View analytics and statistics.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/contributors")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-yellow-500 transition-all duration-300"
+          >
+            <Users className="text-yellow-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Contributors</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              View project contributors.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/server-health")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-red-500 transition-all duration-300"
+          >
+            <Activity className="text-red-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Server Health</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Check backend server status.
             </p>
           </button>
 
