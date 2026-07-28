@@ -1,3 +1,4 @@
+import { addActivity } from "../../utils/activity";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 
@@ -47,6 +48,8 @@ export default function AddRecord() {
   },
   user_id: "27e49c9e-472c-417b-9830-0c53b69654e9",
 });
+      addActivity(`Added record "${title}"`);
+
       alert("Record added successfully!");
 
       setTitle("");
