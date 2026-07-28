@@ -4,15 +4,44 @@ import api from "../../services/api";
 interface RecordItem {
   uid: string;
   title: string;
+  description?: string;
+  media_type?: string;
   extracted_text?: any;
   language?: string;
   [key: string]: any;
 }
 
+// Automatically pulls from your .env file
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
+
+const extractRawString = (item: any): string => {
+  const candidate =
+    item?.extracted_text ??
+    item?.extractedText ??
+    item?.text ??
+    item?.content;
+
+  if (!candidate) return "";
+
+  if (typeof candidate === "string") return candidate;
+
+  if (typeof candidate === "object") {
+    if (Array.isArray(candidate.segments) && candidate.segments.length > 0) {
+      return candidate.segments.map((s: any) => s?.text || "").join(" ");
+    }
+    return candidate.text || candidate.notes || candidate.summary || "";
+  }
+
+  return "";
+};
+
 export default function AISummary() {
   const [records, setRecords] = useState<RecordItem[]>([]);
   const [selectedRecordUid, setSelectedRecordUid] = useState("");
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [summarizing, setSummarizing] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchRecords();
@@ -20,15 +49,19 @@ export default function AISummary() {
 
   const fetchRecords = async () => {
     try {
+      setLoading(true);
       const response = await api.get("/api/v1/records");
-      const data = Array.isArray(response.data) ? response.data : response.data.items || [];
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data.items || [];
       setRecords(data);
     } catch (error) {
       console.error("Failed to fetch records:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Helper function to decode literal \u00XX or \uXXXX Unicode escapes into readable text
   const decodeUnicode = (str: string) => {
     try {
       return str.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) =>
@@ -39,68 +72,179 @@ export default function AISummary() {
     }
   };
 
+  const cleanTextContent = (rawString: string): string => {
+    if (!rawString) return "";
+
+    let processed = rawString;
+    if (processed.startsWith("Sentence:")) {
+      processed = processed.replace(/^Sentence:\s*/, "");
+    } else if (processed.includes("Sentence:")) {
+      processed = processed.replace("Sentence:", "").trim();
+    }
+
+    processed = processed.replace(/<\/?[^>]+(>|$)/g, "");
+    processed = processed.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "");
+    return decodeUnicode(processed).trim();
+  };
+
+  // Real Google Gemini AI API Call
+  const fetchGeminiSummary = async (
+    recordTitle: string,
+    rawContent: string,
+    lang?: string
+  ) => {
+    if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === "") {
+      setText(
+        "⚠️ Missing API Key: Please check that VITE_GEMINI_API_KEY is set in your .env file."
+      );
+      return;
+    }
+
+    setSummarizing(true);
+    setText("🤖 Generating real AI summary via Gemini...");
+
+    try {
+      const languageHint =
+        lang && lang.toLowerCase() !== "und" ? lang : "Telugu / English";
+
+      const prompt = `You are an expert AI summarizer. Please analyze the following corpus record titled "${recordTitle}" and write a clear, natural summary of its main points and meaning. Write the summary in ${languageHint}.\n\nRaw Text Content:\n"${rawContent}"`;
+
+      // Active supported model endpoint: gemini-3.6-flash
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY.trim()}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [{ text: prompt }],
+              },
+            ],
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(
+          errData?.error?.message || `API error (${response.status})`
+        );
+      }
+
+      const result = await response.json();
+      const aiResponse = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (aiResponse) {
+        setText(aiResponse.trim());
+      } else {
+        setText("Unable to parse summary response from Gemini AI.");
+      }
+    } catch (error: any) {
+      console.error("Gemini AI API Error:", error);
+      setText(
+        `Failed to connect to Gemini AI: ${error.message || "Check network or key settings."}`
+      );
+    } finally {
+      setSummarizing(false);
+    }
+  };
+
   const handleSelectRecord = (uid: string) => {
     setSelectedRecordUid(uid);
 
+    if (!uid) {
+      setText("");
+      return;
+    }
+
     const record = records.find((r) => r.uid === uid);
 
-    if (record && record.extracted_text) {
-      const extracted = record.extracted_text;
-      let rawString = "";
+    if (!record) {
+      setText("No record available.");
+      return;
+    }
 
-      // Extract raw string from record
-      if (extracted.segments && Array.isArray(extracted.segments) && extracted.segments.length > 0) {
-        rawString = extracted.segments[0].text || "";
-      } else if (extracted.notes) {
-        rawString = extracted.notes;
-      } else if (typeof extracted === "string") {
-        rawString = extracted;
-      } else {
-        rawString = JSON.stringify(extracted, null, 2);
-      }
+    let rawString = extractRawString(record);
 
-      // 1. Clean non-printable control codes
-      let cleanedText = rawString.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "");
+    if (!rawString.trim() && record.description) {
+      rawString = record.description;
+    }
 
-      // 2. Decode raw Unicode sequences to actual Indic characters
-      cleanedText = decodeUnicode(cleanedText);
+    const cleanedText = cleanTextContent(rawString);
 
-      setText(cleanedText || "No extracted text available for this record.");
+    if (cleanedText && cleanedText.length >= 5) {
+      fetchGeminiSummary(record.title || "Record", cleanedText, record.language);
     } else {
-      setText("No extracted text available for this record.");
+      setText(
+        "No valid text content available to generate a summary for this record."
+      );
     }
   };
+
+  const handleCopy = () => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getLanguageLabel = (record?: RecordItem) => {
+    if (!record?.language || record.language.toLowerCase() === "und") {
+      return "N/A";
+    }
+    return record.language.toUpperCase();
+  };
+
+  const selectedRecord = records.find((r) => r.uid === selectedRecordUid);
 
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold text-gray-800">AI Summary</h1>
-      <p className="text-gray-500 mt-2">View extracted text from corpus records.</p>
+      <p className="text-gray-500 mt-2">
+        Generate real AI summaries using Google Gemini API.
+      </p>
 
       <div className="bg-white rounded-xl shadow p-6 mt-8">
-        {/* Dropdown Selection */}
         <label className="block font-semibold mb-2">Select Record</label>
         <select
           value={selectedRecordUid}
           onChange={(e) => handleSelectRecord(e.target.value)}
-          className="w-full border rounded-lg p-3"
+          disabled={loading || summarizing || records.length === 0}
+          className="w-full border rounded-lg p-3 bg-white disabled:bg-gray-100"
         >
-          <option value="">Select a Record</option>
+          <option value="">
+            {loading ? "Loading records..." : "Select a Record"}
+          </option>
 
-          {records.map((record) => (
-            <option key={record.uid} value={record.uid}>
-              {record.title}
+          {records.map((record, idx) => (
+            <option key={record.uid || idx} value={record.uid}>
+              {idx + 1}. {record.title || `Record ${idx + 1}`}
             </option>
           ))}
         </select>
 
-        {/* Extracted Text Header with Language Badge */}
         <div className="flex justify-between items-center mt-6 mb-2">
-          <label className="font-semibold text-gray-800">Extracted Text</label>
+          <label className="font-semibold text-gray-800">
+            {summarizing ? "Gemini AI Generating Summary..." : "AI Summary"}
+          </label>
 
           {selectedRecordUid && (
-            <span className="text-xs bg-blue-100 text-blue-700 font-medium px-2.5 py-1 rounded">
-              Language: {records.find((r) => r.uid === selectedRecordUid)?.language?.toUpperCase() || "N/A"}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs bg-blue-100 text-blue-700 font-medium px-2.5 py-1 rounded">
+                Language: {getLanguageLabel(selectedRecord)}
+              </span>
+
+              <button
+                onClick={handleCopy}
+                disabled={!text || summarizing}
+                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded transition disabled:opacity-50"
+              >
+                {copied ? "Copied!" : "Copy Summary"}
+              </button>
+            </div>
           )}
         </div>
 
@@ -109,9 +253,10 @@ export default function AISummary() {
           value={text}
           readOnly
           style={{
-            fontFamily: "'Telugu Sangam MN', 'Noto Sans Telugu', 'Gisha', 'Mukta Telugu', 'Segoe UI Historic', system-ui, -apple-system, sans-serif",
+            fontFamily:
+              "'Roboto', 'Noto Sans Telugu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
             fontSize: "16px",
-            lineHeight: "1.6"
+            lineHeight: "1.6",
           }}
           className="w-full border border-gray-300 rounded-lg p-4 text-gray-900 bg-white focus:outline-none shadow-inner"
         />
