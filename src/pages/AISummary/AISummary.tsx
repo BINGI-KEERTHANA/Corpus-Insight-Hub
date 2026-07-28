@@ -201,8 +201,8 @@ export default function AISummary() {
   const selectedRecord = records.find((r) => r.uid === selectedRecordUid);
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold text-gray-800">AI Summary</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">AI Summary</h1>
       <p className="text-gray-500 mt-2">
         Generate real AI summaries using Google Gemini API.
       </p>
