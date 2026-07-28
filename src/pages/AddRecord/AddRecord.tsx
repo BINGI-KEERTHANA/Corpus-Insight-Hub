@@ -9,6 +9,14 @@ export default function AddRecord() {
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [languages] = useState([
+  "English",
+  "Telugu",
+  "Hindi",
+  "Tamil",
+  "Kannada",
+  "Malayalam",
+]);
 
   useEffect(() => {
   const fetchCategories = async () => {
@@ -107,13 +115,19 @@ export default function AddRecord() {
             Language
           </label>
 
-          <input
-            type="text"
-            className="w-full border rounded-lg p-3"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            placeholder="English"
-          />
+          <select
+  className="w-full border rounded-lg p-3"
+  value={language}
+  onChange={(e) => setLanguage(e.target.value)}
+>
+  <option value="">Select Language</option>
+
+  {languages.map((lang) => (
+    <option key={lang} value={lang}>
+      {lang}
+    </option>
+  ))}
+</select>
         </div>
 
         <div>
