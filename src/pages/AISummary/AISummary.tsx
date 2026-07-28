@@ -228,7 +228,7 @@ export default function AISummary() {
 
         <div className="flex justify-between items-center mt-6 mb-2">
           <label className="font-semibold text-gray-800">
-            {summarizing ? "Gemini AI Generating Summary..." : "AI Summary"}
+            {summarizing ? "Gemini AI Generating Summary..." : "Generated Summary"}
           </label>
 
           {selectedRecordUid && (

@@ -38,8 +38,7 @@ export default function Summarizer() {
       <h2>AI Text Summarizer</h2>
       
       {/* Input Text Box */}
-      <textarea
-        rows="8"
+      <textarea rows={4}
         style={{ width: '100%', padding: '10px' }}
         placeholder="Paste your text here..."
         value={inputText}
