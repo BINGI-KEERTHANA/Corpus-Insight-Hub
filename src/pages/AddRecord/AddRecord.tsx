@@ -1,27 +1,34 @@
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 
+// 1. Interface for category items (replaces 'any')
+interface CategoryItem {
+  id: string | number;
+  title: string;
+}
+
 export default function AddRecord() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState([]);
+  // 2. Type state properly with CategoryItem[]
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
 
   useEffect(() => {
-  const fetchCategories = async () => {
-    try {
-      const response = await api.get("/api/v1/categories/");
-      console.log(response.data); // Add this line
-      setCategories(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get("/api/v1/categories/");
+        console.log(response.data);
+        setCategories(response.data);
+      } catch (error: unknown) { // 3. Typed catch block error
+        console.error(error);
+      }
+    };
 
-  fetchCategories();
-}, []);
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,25 +42,25 @@ export default function AddRecord() {
       setLoading(true);
 
       await api.post("/api/v1/records/", {
-  title,
-  description,
-  language,
-  media_type: "text",
-  release_rights: "creator",
-  category_ids: [category],
-  location: {
-    latitude: 17.385,
-    longitude: 78.4867,
-  },
-  user_id: "27e49c9e-472c-417b-9830-0c53b69654e9",
-});
+        title,
+        description,
+        language,
+        media_type: "text",
+        release_rights: "creator",
+        category_ids: [category],
+        location: {
+          latitude: 17.385,
+          longitude: 78.4867,
+        },
+        user_id: "27e49c9e-472c-417b-9830-0c53b69654e9",
+      });
       alert("Record added successfully!");
 
       setTitle("");
       setDescription("");
       setLanguage("");
       setCategory("");
-    } catch (error) {
+    } catch (error: unknown) { // 3. Typed catch block error
       console.error(error);
       alert("Failed to add record.");
     } finally {
@@ -119,18 +126,19 @@ export default function AddRecord() {
           </label>
 
           <select
-  className="w-full border rounded-lg p-3"
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
->
-  <option value="">Select Category</option>
+            className="w-full border rounded-lg p-3"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="">Select Category</option>
 
-  {categories.map((item: any) => (
-    <option key={item.id} value={item.id}>
-      {item.title}
-    </option>
-  ))}
-</select>
+            {/* 4. 'item' is now typed automatically, no 'any' needed */}
+            {categories.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.title}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button

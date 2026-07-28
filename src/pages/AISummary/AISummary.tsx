@@ -1,35 +1,51 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
+// 1. Defined Segment interface to avoid 'any'
+interface TextSegment {
+  text?: string;
+}
+
+// 2. Defined ExtractedText structure
+interface ExtractedTextObject {
+  segments?: TextSegment[];
+  text?: string;
+  notes?: string;
+  summary?: string;
+}
+
+// 3. Clean RecordItem interface with no 'any'
 interface RecordItem {
   uid: string;
   title: string;
   description?: string;
   media_type?: string;
-  extracted_text?: any;
+  extracted_text?: string | ExtractedTextObject | unknown;
   language?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Automatically pulls from your .env file
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
-const extractRawString = (item: any): string => {
+// 4. Clean extractRawString function with no 'any'
+const extractRawString = (item: RecordItem): string => {
   const candidate =
     item?.extracted_text ??
-    item?.extractedText ??
-    item?.text ??
-    item?.content;
+    (item as Record<string, unknown>)?.extractedText ??
+    (item as Record<string, unknown>)?.text ??
+    (item as Record<string, unknown>)?.content;
 
   if (!candidate) return "";
 
   if (typeof candidate === "string") return candidate;
 
-  if (typeof candidate === "object") {
-    if (Array.isArray(candidate.segments) && candidate.segments.length > 0) {
-      return candidate.segments.map((s: any) => s?.text || "").join(" ");
+  if (typeof candidate === "object" && candidate !== null) {
+    const obj = candidate as ExtractedTextObject;
+    if (Array.isArray(obj.segments) && obj.segments.length > 0) {
+      return obj.segments.map((s) => s?.text || "").join(" ");
     }
-    return candidate.text || candidate.notes || candidate.summary || "";
+    return obj.text || obj.notes || obj.summary || "";
   }
 
   return "";
@@ -43,10 +59,8 @@ export default function AISummary() {
   const [summarizing, setSummarizing] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    fetchRecords();
-  }, []);
-
+  // 1. Declare fetchRecords FIRST
+useEffect(() => {
   const fetchRecords = async () => {
     try {
       setLoading(true);
@@ -55,19 +69,23 @@ export default function AISummary() {
         ? response.data
         : response.data.items || [];
       setRecords(data);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to fetch records:", error);
     } finally {
       setLoading(false);
     }
   };
 
+    fetchRecords();
+  }, []);
+
+  // 3. Clean catch block in decodeUnicode
   const decodeUnicode = (str: string) => {
     try {
       return str.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) =>
         String.fromCharCode(parseInt(hex, 16))
       );
-    } catch (e) {
+    } catch {
       return str;
     }
   };
@@ -83,6 +101,7 @@ export default function AISummary() {
     }
 
     processed = processed.replace(/<\/?[^>]+(>|$)/g, "");
+    // eslint-disable-next-line no-control-regex
     processed = processed.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "");
     return decodeUnicode(processed).trim();
   };
@@ -109,9 +128,9 @@ export default function AISummary() {
 
       const prompt = `You are an expert AI summarizer. Please analyze the following corpus record titled "${recordTitle}" and write a clear, natural summary of its main points and meaning. Write the summary in ${languageHint}.\n\nRaw Text Content:\n"${rawContent}"`;
 
-      // Active supported model endpoint: gemini-3.6-flash
+      // Active supported model endpoint
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY.trim()}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY.trim()}`,
         {
           method: "POST",
           headers: {
@@ -128,7 +147,7 @@ export default function AISummary() {
       );
 
       if (!response.ok) {
-        const errData = await response.json();
+        const errData = (await response.json()) as { error?: { message?: string } };
         throw new Error(
           errData?.error?.message || `API error (${response.status})`
         );
@@ -142,11 +161,11 @@ export default function AISummary() {
       } else {
         setText("Unable to parse summary response from Gemini AI.");
       }
-    } catch (error: any) {
+    } catch (error: unknown) { // 5. Fixed catch error type from 'any' to 'unknown'
       console.error("Gemini AI API Error:", error);
-      setText(
-        `Failed to connect to Gemini AI: ${error.message || "Check network or key settings."}`
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Check network or key settings.";
+      setText(`Failed to connect to Gemini AI: ${errorMessage}`);
     } finally {
       setSummarizing(false);
     }
