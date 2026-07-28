@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import api from "../../services/api";
+import { addActivity } from "../../utils/activity";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -33,8 +34,9 @@ export default function Login() {
         "access_token",
         response.data.access_token
       );
-
+      addActivity("✅ Logged in successfully");
       navigate("/dashboard");
+      
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         setErrorMessage(
