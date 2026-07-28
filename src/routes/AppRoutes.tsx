@@ -119,27 +119,60 @@ export default function AppRoutes() {
   }
 />
 <Route
-  path="/add-record"
-  element={
-    <ProtectedRoute>
-      <Layout>
-        <AddRecord />
-      </Layout>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/ai-summary"
-  element={
-    <ProtectedRoute>
-      <Layout>
-        <AISummary />
-      </Layout>
-    </ProtectedRoute>
-  }
-/>
-</Routes>
+          path="/add-record"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AddRecord />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-</BrowserRouter>
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Analytics />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/contributors"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Contributors />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ai-summary"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AISummary />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/server-health"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ServerHealth />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
