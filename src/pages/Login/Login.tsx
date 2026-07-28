@@ -12,11 +12,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
-
   const [loading, setLoading] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
-
 
 
   const handleLogin = async () => {
@@ -25,7 +22,6 @@ export default function Login() {
 
       setErrorMessage("");
       setLoading(true);
-
 
 
       const response = await api.post(
@@ -37,15 +33,13 @@ export default function Login() {
       );
 
 
-
       console.log(
         "Login Response:",
         response.data
       );
 
 
-
-      // Save access token
+      // Save token
 
       localStorage.setItem(
         "access_token",
@@ -53,13 +47,11 @@ export default function Login() {
       );
 
 
-
       // Save user id
 
       const userId =
         response.data.user_id ||
         response.data.user?.id;
-
 
 
       if (userId) {
@@ -77,57 +69,72 @@ export default function Login() {
 
       try {
 
-
-        const deviceResponse =
-          await api.get(
-            "/api/v1/devices"
-          );
-
+        const deviceResponse = await api.get(
+          "/api/v1/devices/"
+        );
 
 
         console.log(
-          "Device Response:",
+          "FULL DEVICE RESPONSE:",
+          deviceResponse
+        );
+
+
+        console.log(
+          "DEVICE DATA:",
           deviceResponse.data
         );
 
 
 
         if (
-          deviceResponse.data &&
+          Array.isArray(deviceResponse.data) &&
           deviceResponse.data.length > 0
         ) {
 
 
-          // Use uid instead of device_id
+          // IMPORTANT: use device_id not uid
 
           const deviceId =
-            deviceResponse.data[0].uid;
+            deviceResponse.data[0].device_id;
 
 
 
-          localStorage.setItem(
-            "device_id",
-            deviceId
-          );
+          if (deviceId) {
 
+
+            localStorage.setItem(
+              "device_id",
+              deviceId
+            );
+
+
+            console.log(
+              "Saved Device ID:",
+              deviceId
+            );
+
+
+          }
+
+
+        } else {
 
 
           console.log(
-            "Saved Device ID:",
-            deviceId
+            "No device found"
           );
 
 
         }
 
 
-
-      } catch (deviceError) {
+      } catch(error) {
 
 
         console.log(
-          "Device Fetch Error:",
-          deviceError
+          "Device API Error:",
+          error
         );
 
 
@@ -135,11 +142,23 @@ export default function Login() {
 
 
 
+      console.log(
+        "Stored User ID:",
+        localStorage.getItem("user_id")
+      );
+
+
+      console.log(
+        "Stored Device ID:",
+        localStorage.getItem("device_id")
+      );
+
+
       navigate("/dashboard");
 
 
 
-    } catch (error: unknown) {
+    } catch(error: unknown) {
 
 
       if (axios.isAxiosError(error)) {
@@ -177,7 +196,6 @@ export default function Login() {
 
 
 
-
   return (
 
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
@@ -206,14 +224,12 @@ export default function Login() {
           </h1>
 
 
-
           <p className="text-blue-100 mt-2">
             Secure access to your Corpus workspace
           </p>
 
 
         </div>
-
 
 
 
@@ -250,8 +266,8 @@ export default function Login() {
 
               />
 
-            </div>
 
+            </div>
 
 
 
@@ -261,7 +277,6 @@ export default function Login() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
-
 
 
               <div className="relative">
@@ -309,14 +324,14 @@ export default function Login() {
                     <Eye size={20}/>
                   }
 
+
                 </button>
 
 
               </div>
 
+
             </div>
-
-
 
 
 
@@ -341,8 +356,8 @@ export default function Login() {
                 "Sign In"
               }
 
-            </button>
 
+            </button>
 
 
 
@@ -358,7 +373,6 @@ export default function Login() {
 
               )
             }
-
 
 
           </form>
