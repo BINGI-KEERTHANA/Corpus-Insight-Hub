@@ -4,11 +4,13 @@ import api from "../../services/api";
 
 export default function AddRecord() {
   const [title, setTitle] = useState("");
+  const [titleError, setTitleError] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  
   const [languages] = useState([
   "English",
   "Telugu",
@@ -39,6 +41,10 @@ export default function AddRecord() {
       alert("Please fill all fields.");
       return;
     }
+    if (title.trim().length < 8) {
+  setTitleError("Title must contain at least 8 characters.");
+  return;
+}
 
     try {
       setLoading(true);
@@ -88,12 +94,27 @@ export default function AddRecord() {
           </label>
 
           <input
-            type="text"
-            className="w-full border rounded-lg p-3"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter title"
-          />
+  type="text"
+  className="w-full border rounded-lg p-3"
+  value={title}
+  onChange={(e) => {
+    const value = e.target.value;
+    setTitle(value);
+
+    if (value.length > 0 && value.length < 8) {
+      setTitleError("Title must contain at least 8 characters.");
+    } else {
+      setTitleError("");
+    }
+  }}
+  placeholder="Enter at least 8 characters"
+/>
+
+{titleError && (
+  <p className="text-red-500 text-sm mt-1">
+    {titleError}
+  </p>
+)}
         </div>
 
         <div>
