@@ -11,7 +11,6 @@ import {
   Upload,
   PlusCircle,
   BarChart3,
-  Users,
   Sparkles,
   Activity,
   AudioLines,
@@ -245,18 +244,6 @@ export default function Dashboard() {
             <h3 className="font-bold text-lg">Analytics</h3>
             <p className="text-gray-500 mt-2 text-sm">
               View analytics and statistics.
-            </p>
-          </button>
-
-          <button
-
-            onClick={() => navigate("/contributors")}
-            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-yellow-500 transition-all duration-300"
-          >
-            <Users className="text-yellow-500 mb-3" size={34} />
-            <h3 className="font-bold text-lg">Contributors</h3>
-            <p className="text-gray-500 mt-2 text-sm">
-              View project contributors.
             </p>
           </button>
 
