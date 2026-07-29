@@ -57,14 +57,10 @@ export default function AddRecord() {
         device_id: deviceId,
       };
 
-      console.log("Sending Record:", recordData);
-
-      const response = await api.post(
+      await api.post(
         "/api/v1/records/?generate_file=false&file_size_kb=10",
         recordData
       );
-
-      console.log("Success:", response.data);
 
       alert("Record added successfully!");
 
@@ -72,19 +68,15 @@ export default function AddRecord() {
       setContent("");
 
     } catch (error: any) {
-
       console.error("Backend Error:", error.response?.data);
 
       alert(
         error.response?.data?.message ||
-        error.response?.data?.detail ||
-        "Failed to add record"
+          error.response?.data?.detail ||
+          "Failed to add record"
       );
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
