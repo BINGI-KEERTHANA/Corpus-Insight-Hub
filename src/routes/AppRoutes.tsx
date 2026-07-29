@@ -19,6 +19,7 @@ import Analytics from "../pages/Analytics/Analytics";
 import Contributors from "../pages/Contributors/Contributors";
 import AISummary from "../pages/AISummary/AISummary";
 import ServerHealth from "../pages/ServerHealth/ServerHealth";
+import AudioQualityAssessment from "../pages/AudioQualityAssessment/AudioQualityAssessment";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("access_token");
@@ -157,6 +158,17 @@ export default function AppRoutes() {
     <ProtectedRoute>
       <Layout>
         <AISummary />
+      </Layout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/audio-quality"
+  element={
+    <ProtectedRoute>
+      <Layout>
+        <AudioQualityAssessment />
       </Layout>
     </ProtectedRoute>
   }
