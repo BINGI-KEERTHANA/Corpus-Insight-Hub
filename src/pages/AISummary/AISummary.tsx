@@ -168,7 +168,7 @@ export default function AISummary() {
     const maxRetries = 3;
     let attempt = 0;
     let success = false;
-    const baseDelayMs = 5000; // Wait 5 seconds on first rate limit hit
+    const baseDelayMs = 15000; // Wait 5 seconds on first rate limit hit
 
     while (attempt <= maxRetries && !success) {
       try {
