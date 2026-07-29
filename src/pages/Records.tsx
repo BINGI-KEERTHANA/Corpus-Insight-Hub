@@ -22,36 +22,30 @@ export default function Records() {
     const fetchRecords = async () => {
       try {
         const recordsResponse = await api.get("/api/v1/records?limit=10");
-
-        console.log(recordsResponse.data);
-        console.log(recordsResponse.data.length);
-
         setRecords(recordsResponse.data);
-     } 
-     catch (error) {
-     console.error("Failed to fetch records:", error);
-  } 
- finally {
-  setLoading(false);
- }
+      } catch (error) {
+        console.error("Failed to fetch records:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchRecords();
   }, []);
 
   if (loading) {
-  return (
-    <div className="flex items-center justify-center h-[70vh]">
-      <div className="text-center">
-        <div className="h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="mt-4 text-gray-600 font-medium">
-          Loading records...
-        </p>
+    return (
+      <div className="flex items-center justify-center h-[70vh]">
+        <div className="text-center">
+          <div className="h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">
+            Loading records...
+          </p>
+        </div>
       </div>
-    </div>
-  );
-}
-console.log(records);
+    );
+  }
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-6">Records</h1>
