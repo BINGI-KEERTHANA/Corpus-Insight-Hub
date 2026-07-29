@@ -12,6 +12,7 @@ import {
   Users,
   Sparkles,
   Activity,
+  AudioLines,
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -55,6 +56,16 @@ export default function Sidebar() {
             <Link to="/categories" className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800">
               <Folder size={20} />
               Categories
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/audio-quality"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+            >
+              <AudioLines size={20} />
+              Audio Quality
             </Link>
           </li>
 

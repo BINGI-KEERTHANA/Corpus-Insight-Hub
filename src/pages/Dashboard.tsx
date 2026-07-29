@@ -14,6 +14,7 @@ import {
   Users,
   Sparkles,
   Activity,
+  AudioLines,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -255,6 +256,17 @@ export default function Dashboard() {
             <h3 className="font-bold text-lg">Contributors</h3>
             <p className="text-gray-500 mt-2 text-sm">
               View project contributors.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/audio-quality")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-indigo-500 transition-all duration-300"
+          >
+            <AudioLines className="text-indigo-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Audio Quality Assessment</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Analyze WAV loudness, noise, clipping, and silence.
             </p>
           </button>
 

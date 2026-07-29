@@ -207,7 +207,7 @@ https://code.swecha.org/BINGI-KEERTHANA/corpus-insight-hub
 
 **Team Lead**
 
-- Keerthana Bingi
+- Sindhuja Jagarapu
 
 **Project**
 
