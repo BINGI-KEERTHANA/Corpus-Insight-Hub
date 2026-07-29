@@ -87,15 +87,6 @@ export default function Sidebar() {
             </Link>
           </li>
 
-          <li>
-            <Link
-              to="/contributors"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
-            >
-              <Users size={20} />
-              Contributors
-            </Link>
-          </li>
 
           <li>
               <Link
