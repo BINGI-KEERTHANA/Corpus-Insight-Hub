@@ -9,6 +9,7 @@ export default function Login() {
 
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,20 +24,58 @@ export default function Login() {
         password,
       });
 
-      localStorage.setItem("access_token", response.data.access_token);
+      // Save token
+      localStorage.setItem(
+        "access_token",
+        response.data.access_token
+      );
+
+      // Save user id
+      const userId =
+        response.data.user_id ||
+        response.data.user?.id;
+
+      if (userId) {
+        localStorage.setItem("user_id", userId);
+      }
+
+      // Get device details
+      try {
+        const deviceResponse = await api.get(
+          "/api/v1/devices/"
+        );
+
+        if (
+          Array.isArray(deviceResponse.data) &&
+          deviceResponse.data.length > 0
+        ) {
+          // IMPORTANT: use device_id not uid
+          const deviceId =
+            deviceResponse.data[0].device_id;
+
+          if (deviceId) {
+            localStorage.setItem(
+              "device_id",
+              deviceId
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Device API Error:", error);
+      }
 
       navigate("/dashboard");
     } catch (error: unknown) {
-  if (axios.isAxiosError(error)) {
-    setErrorMessage(
-      error.response?.data?.detail ||
-      error.response?.data?.message ||
-      "Login failed"
-    );
-  } else {
-    setErrorMessage("Login failed");
-  }
-} finally {
+      if (axios.isAxiosError(error)) {
+        setErrorMessage(
+          error.response?.data?.detail ||
+            error.response?.data?.message ||
+            "Login failed"
+        );
+      } else {
+        setErrorMessage("Login failed");
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -44,7 +83,6 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header */}
         <div className="bg-blue-600 text-white px-8 py-10 text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-white/20 p-4 rounded-full">
@@ -52,14 +90,15 @@ export default function Login() {
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold">LexiHub</h1>
+          <h1 className="text-3xl font-bold">
+            LexiHub
+          </h1>
 
           <p className="text-blue-100 mt-2">
             Secure access to your Corpus workspace
           </p>
         </div>
 
-        {/* Form */}
         <div className="p-8">
           <form
             className="space-y-6"
@@ -75,7 +114,7 @@ export default function Login() {
                 placeholder="+91XXXXXXXXXX"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3"
               />
             </div>
 
@@ -89,14 +128,18 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12"
                 />
 
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-600"
+                  onClick={() =>
+                    setShowPassword(!showPassword)
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
                 >
                   {showPassword ? (
                     <EyeOff size={20} />
@@ -111,13 +154,13 @@ export default function Login() {
               type="button"
               onClick={handleLogin}
               disabled={loading}
-              className="w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl bg-blue-600 py-3 text-white"
             >
               {loading ? "Signing In..." : "Sign In"}
             </button>
 
             {errorMessage && (
-              <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center text-sm text-red-600">
+              <div className="rounded-lg bg-red-50 p-3 text-red-600">
                 {errorMessage}
               </div>
             )}
