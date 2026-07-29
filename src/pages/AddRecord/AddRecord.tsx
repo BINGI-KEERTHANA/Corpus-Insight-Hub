@@ -99,6 +99,7 @@ if (description.trim().length < 20) {
 
           <input
   type="text"
+  required
   className="w-full border rounded-lg p-3"
   value={title}
   onChange={(e) => {
@@ -128,6 +129,7 @@ if (description.trim().length < 20) {
 
           <textarea
   rows={5}
+  required
   className="w-full border rounded-lg p-3"
   value={description}
   onChange={(e) => {
@@ -156,6 +158,7 @@ if (description.trim().length < 20) {
           </label>
 
           <select
+          required
   className="w-full border rounded-lg p-3"
   value={language}
   onChange={(e) => setLanguage(e.target.value)}
@@ -176,6 +179,7 @@ if (description.trim().length < 20) {
           </label>
 
           <select
+          required
   className="w-full border rounded-lg p-3"
   value={category}
   onChange={(e) => setCategory(e.target.value)}
