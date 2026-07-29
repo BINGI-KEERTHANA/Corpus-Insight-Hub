@@ -249,6 +249,7 @@ export default function Dashboard() {
           </button>
 
           <button
+
             onClick={() => navigate("/contributors")}
             className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-yellow-500 transition-all duration-300"
           >

@@ -16,7 +16,6 @@ import RecordDetails from "../pages/RecordDetails";
 import UploadDocuments from "../pages/UploadDocuments/UploadDocuments";
 import AddRecord from "../pages/AddRecord/AddRecord";
 import Analytics from "../pages/Analytics/Analytics";
-import Contributors from "../pages/Contributors/Contributors";
 import AISummary from "../pages/AISummary/AISummary";
 import ServerHealth from "../pages/ServerHealth/ServerHealth";
 import AudioQualityAssessment from "../pages/AudioQualityAssessment/AudioQualityAssessment";
@@ -141,16 +140,6 @@ export default function AppRoutes() {
           }
         />
 
-        <Route
-          path="/contributors"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Contributors />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
 
         <Route
           path="/ai-summary"
