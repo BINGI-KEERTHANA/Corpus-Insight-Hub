@@ -5,6 +5,7 @@ import api from "../../services/api";
 export default function AddRecord() {
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
@@ -45,7 +46,10 @@ export default function AddRecord() {
   setTitleError("Title must contain at least 8 characters.");
   return;
 }
-
+if (description.trim().length < 20) {
+  setDescriptionError("Description must contain at least 20 characters.");
+  return;
+}
     try {
       setLoading(true);
 
@@ -123,12 +127,27 @@ export default function AddRecord() {
           </label>
 
           <textarea
-            rows={5}
-            className="w-full border rounded-lg p-3"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter description"
-          />
+  rows={5}
+  className="w-full border rounded-lg p-3"
+  value={description}
+  onChange={(e) => {
+    const value = e.target.value;
+    setDescription(value);
+
+    if (value.length > 0 && value.length < 20) {
+      setDescriptionError("Description must contain at least 20 characters.");
+    } else {
+      setDescriptionError("");
+    }
+  }}
+  placeholder="Enter description"
+/>
+
+{descriptionError && (
+  <p className="text-red-500 text-sm mt-1">
+    {descriptionError}
+  </p>
+)}
         </div>
 
         <div>
