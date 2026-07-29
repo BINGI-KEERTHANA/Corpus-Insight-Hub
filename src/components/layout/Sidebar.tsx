@@ -9,7 +9,6 @@ import {
   Upload,
   PlusCircle,
   BarChart3,
-  Users,
   Sparkles,
   Activity,
   AudioLines,
