@@ -1,3 +1,4 @@
+import { addActivity } from "../../utils/activity";
 import { useState } from "react";
 import api from "../../services/api";
 
@@ -39,6 +40,7 @@ export default function SearchPage() {
 
 
       setRecords(fullRecords);
+      addActivity(`Searched for "${query}"`);
     } catch (error) {
       console.error("Search failed:", error);
       setRecords([]);

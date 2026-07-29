@@ -1,3 +1,5 @@
+import { getActivities } from "../utils/activity";
+import type { ActivityItem } from "../utils/activity";
 import { useEffect, useState } from "react";
 import {
   Database,
@@ -31,6 +33,8 @@ export default function Dashboard() {
   const [totalLanguages, setTotalLanguages] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
 
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -42,7 +46,10 @@ export default function Dashboard() {
         setTotalLanguages(languagesResponse.data.length);
         const categoriesResponse = await api.get("/api/v1/categories");
         setTotalCategories(categoriesResponse.data.length);
-    }
+
+        
+        setActivities(getActivities());
+      }
       catch (error) {
         console.error("Failed to fetch user:", error);
       }
@@ -271,23 +278,20 @@ export default function Dashboard() {
           Recent Activity
         </h2>
 
-        <ul className="space-y-4">
-          <li className="border-b pb-3">
-            ✅ Logged in successfully
-          </li>
-
-          <li className="border-b pb-3">
-            📄 Accessed Records
-          </li>
-
-          <li className="border-b pb-3">
-            🔍 Opened Search Module
-          </li>
-
-          <li>
-            👤 Viewed User Dashboard
-          </li>
-        </ul>
+   <ul className="space-y-4">
+  {activities.length === 0 ? (
+    <li className="text-gray-500">
+      No recent activity yet.
+    </li>
+  ) : (
+    activities.map((activity, index) => (
+      <li key={index} className="border-b pb-3">
+        <p className="font-medium">{activity.message}</p>
+        <p className="text-sm text-gray-500">{activity.time}</p>
+      </li>
+    ))
+  )}
+</ul>
       </div>
 
     </div>
