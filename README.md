@@ -1,211 +1,220 @@
-# 🧠 LexiHub
+# Corpus Insight Hub
 
-LexiHub is a modern React-based client application that integrates with the Corpus API to provide a user-friendly interface for exploring and managing corpus resources. It allows authenticated users to browse records, search data, view languages, categories, events, and profile information through a clean and responsive dashboard.
+Corpus Insight Hub is a modern web application built using **React**, **TypeScript**, **Vite**, and **Tailwind CSS**. It serves as a client application for interacting with the Corpus API, allowing users to search, browse, and manage corpus records through an intuitive interface.
 
----
-
-## 🚀 Features
-
-- 🔐 JWT-based User Authentication
-- 📊 Dashboard with corpus statistics
-- 🔍 Search corpus records
-- 📄 View all records
-- 📑 Record Details page
-- 🌐 Languages listing
-- 📂 Categories listing
-- 📅 Events page
-- 👤 User Profile
-- 🛡️ Protected Routes
-- ⚠️ Graceful API error handling
-- 📱 Responsive user interface
+The application also includes an **AI Summary** feature powered by the **Google Gemini API**, enabling users to generate concise summaries of textual content.
 
 ---
 
-## 🛠️ Tech Stack
+## Features
+
+- User Authentication
+- Dashboard with Statistics
+- Search Corpus Records
+- View Record Details
+- AI-Powered Text Summarization
+- Responsive User Interface
+- Modern Sidebar Navigation
+- Fast and Optimized Performance
+- Production Build Support
+
+---
+
+## Tech Stack
 
 ### Frontend
+
 - React
 - TypeScript
 - Vite
 - Tailwind CSS
-
-### Routing
 - React Router DOM
-
-### HTTP Client
 - Axios
-
-### Icons
 - Lucide React
 
+### Backend
+
+- Python
+- Gemini API Integration
+
 ---
 
-## 📂 Project Structure
+## Project Structure
 
-```text
-src/
-├── components/
-│   └── layout/
-│       ├── Layout.tsx
-│       ├── Navbar.tsx
-│       └── Sidebar.tsx
+```
+corpus-insight-hub/
 │
-├── constants/
-│   └── api.ts
+├── backend/
+│   ├── ai.py
+│   ├── main.py
+│   └── requirements.txt
 │
-├── pages/
-│   ├── Dashboard.tsx
-│   ├── Records.tsx
-│   ├── RecordDetails.tsx
-│   ├── Search/
-│   ├── Languages.tsx
-│   ├── Categories.tsx
-│   ├── Events.tsx
-│   ├── Login/
-│   └── Profile/
+├── public/
 │
-├── routes/
-│   └── AppRoutes.tsx
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── constants/
+│   ├── hooks/
+│   ├── pages/
+│   ├── routes/
+│   ├── services/
+│   ├── App.tsx
+│   └── main.tsx
 │
-├── services/
-│   └── api.ts
-│
-├── App.tsx
-├── main.tsx
-└── index.css
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+├── .gitignore
+└── README.md
 ```
 
 ---
 
-## 🔑 Authentication
+## Installation
 
-LexiHub uses JWT (JSON Web Token) authentication.
-
-1. User logs in using phone number and password.
-2. Backend validates credentials.
-3. JWT access token is returned.
-4. Token is stored in localStorage.
-5. Axios automatically includes the token in authenticated API requests.
-
----
-
-## 📡 API Endpoints Used
-
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/api/v1/auth/login` | User Login |
-| GET | `/api/v1/auth/me` | Logged-in User |
-| GET | `/api/v1/records` | Fetch Records |
-| GET | `/api/v1/records/{id}` | Record Details |
-| GET | `/api/v1/languages` | Languages |
-| GET | `/api/v1/categories` | Categories |
-| GET | `/api/v1/events` | Events |
-
----
-
-## ⚙️ Installation
-
-Clone the repository:
+### Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://code.swecha.org/BINGI-KEERTHANA/corpus-insight-hub.git
 ```
 
-Move into the project directory:
+Move into the project directory.
 
 ```bash
-cd lexihub
+cd corpus-insight-hub
 ```
 
-Install dependencies:
+Install all required dependencies.
 
 ```bash
 npm install
 ```
 
-Start the development server:
+---
+
+## Environment Variables
+
+Create a `.env` file in the root directory.
+
+Add the following variable:
+
+```env
+VITE_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+Replace `YOUR_GEMINI_API_KEY` with your actual Gemini API key.
+
+---
+
+## Running the Application
+
+Start the development server.
 
 ```bash
 npm run dev
+```
+
+The application will be available at:
+
+```
+http://localhost:5173
 ```
 
 ---
 
-## 📦 Available Scripts
+## Production Build
 
-```bash
-npm run dev
-```
-
-Runs the application in development mode.
+Generate a production build.
 
 ```bash
 npm run build
 ```
 
-Builds the project for production.
+Preview the production build.
 
 ```bash
 npm run preview
 ```
 
-Previews the production build locally.
+---
+
+## Available Scripts
+
+Install dependencies
 
 ```bash
-npm run lint
+npm install
 ```
 
-Runs ESLint to check code quality.
+Run development server
 
----
+```bash
+npm run dev
+```
 
-## 🏗️ Architecture
+Build application
 
-```text
-User
-   │
-   ▼
-React (LexiHub)
-   │
-Axios HTTP Requests
-   │
-   ▼
-Corpus REST API
-   │
-   ▼
-Database
+```bash
+npm run build
+```
+
+Preview production build
+
+```bash
+npm run preview
 ```
 
 ---
 
-## ✨ Key Functionalities
+## Application Modules
 
-- Secure authentication using JWT
-- Reusable layout with Sidebar and Navbar
-- API integration using Axios
-- Dynamic dashboard statistics
-- Search and browse corpus resources
-- Detailed record view
-- Protected routing
-- Error handling for unavailable APIs
-- Clean and responsive interface
+- Login
+- Dashboard
+- Search Records
+- Record Details
+- AI Summary
+- Navigation Sidebar
+- Responsive Layout
 
 ---
 
-## 🔮 Future Enhancements
+## AI Summary
 
-- Dynamic Recent Activities
-- Pagination
-- Search filters
-- Sorting options
-- Mobile UI improvements
-- Dark mode
-- Role-based access control
+The AI Summary feature integrates with the Google Gemini API to generate concise summaries from input text.
+
+### Requirements
+
+Create a `.env` file and configure:
+
+```env
+VITE_GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+Without this key, the AI Summary feature will not function.
 
 ---
 
-## 👩‍💻 Author
+## Repository
 
-**Keerthana Bingi**
+```
+https://code.swecha.org/BINGI-KEERTHANA/corpus-insight-hub
+```
 
-Developed as part of the **Swecha Internship** using React, TypeScript, Vite, Tailwind CSS, and the Corpus REST API.
+---
+
+## Team
+
+**Team Lead**
+
+- Sindhuja Jagarapu
+
+**Project**
+
+- Corpus Insight Hub
+
+---
+
+## Acknowledgements
+
+This project was developed as part of the **Swecha Internship Program**. It demonstrates integration with the Corpus API, modern frontend development using React and TypeScript, and AI-powered text summarization using Google's Gemini API.

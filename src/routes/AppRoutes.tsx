@@ -18,6 +18,7 @@ import AddRecord from "../pages/AddRecord/AddRecord";
 import Analytics from "../pages/Analytics/Analytics";
 import AISummary from "../pages/AISummary/AISummary";
 import ServerHealth from "../pages/ServerHealth/ServerHealth";
+import AudioQualityAssessment from "../pages/AudioQualityAssessment/AudioQualityAssessment";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem("access_token");
@@ -118,52 +119,61 @@ export default function AppRoutes() {
   }
 />
 <Route
-  path="/add-record"
-  element={
-    <ProtectedRoute>
-      <Layout>
-        <AddRecord />
-      </Layout>
-    </ProtectedRoute>
-  }
-/>
+          path="/add-record"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AddRecord />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/analytics"
-  element={
-    <ProtectedRoute>
-      <Layout>
-        <Analytics />
-      </Layout>
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Analytics />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
 
-<Route
-  path="/ai-summary"
-  element={
-    <ProtectedRoute>
-      <Layout>
-        <AISummary />
-      </Layout>
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/ai-summary"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AISummary />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/server-health"
-  element={
-    <ProtectedRoute>
-      <Layout>
-        <ServerHealth />
-      </Layout>
-    </ProtectedRoute>
-  }
-/>
+        <Route
+          path="/server-health"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ServerHealth />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-</Routes>
-
-</BrowserRouter>
+        <Route
+          path="/audio-quality"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AudioQualityAssessment />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }

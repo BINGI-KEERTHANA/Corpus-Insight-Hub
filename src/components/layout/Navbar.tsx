@@ -1,6 +1,7 @@
-import { Bell, LogOut, UserCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Bell, LogOut, UserCircle } from "lucide-react";
 import api from "../../services/api";
 
 interface User {
@@ -12,16 +13,42 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
     const fetchUser = async () => {
       try {
-        const response = await api.get("/api/v1/auth/me");
-        setUser(response.data);
-      } catch (error) {
+        const response = await api.get("/api/v1/user", {
+          signal: controller.signal,
+        });
+        if (isMounted) {
+          setUser(response.data);
+        }
+      } catch (error: unknown) {
+        // 1. Ignore React cancellation aborts
+        const isCanceled =
+          axios.isCancel(error) ||
+          (error as { name?: string })?.name === "CanceledError" ||
+          (error as { code?: string })?.code === "ERR_CANCELED";
+
+        if (isCanceled) return;
+
+        // 2. Ignore 404 (Endpoint doesn't exist yet or user not logged in)
+        if ((error as { response?: { status?: number } })?.response?.status === 404) {
+          if (isMounted) setUser(null);
+          return;
+        }
+
         console.error("Failed to fetch user:", error);
       }
     };
 
     fetchUser();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   const handleLogout = () => {

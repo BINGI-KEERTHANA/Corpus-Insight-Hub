@@ -1,3 +1,5 @@
+import { getActivities } from "../utils/activity";
+import type { ActivityItem } from "../utils/activity";
 import { useEffect, useState } from "react";
 import {
   Database,
@@ -12,6 +14,7 @@ import {
   Users,
   Sparkles,
   Activity,
+  AudioLines,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -31,6 +34,8 @@ export default function Dashboard() {
   const [totalLanguages, setTotalLanguages] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
 
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -42,7 +47,10 @@ export default function Dashboard() {
         setTotalLanguages(languagesResponse.data.length);
         const categoriesResponse = await api.get("/api/v1/categories");
         setTotalCategories(categoriesResponse.data.length);
-    }
+
+        
+        setActivities(getActivities());
+      }
       catch (error) {
         console.error("Failed to fetch user:", error);
       }
@@ -241,6 +249,29 @@ export default function Dashboard() {
           </button>
 
           <button
+
+            onClick={() => navigate("/contributors")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-yellow-500 transition-all duration-300"
+          >
+            <Users className="text-yellow-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Contributors</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              View project contributors.
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/audio-quality")}
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-indigo-500 transition-all duration-300"
+          >
+            <AudioLines className="text-indigo-500 mb-3" size={34} />
+            <h3 className="font-bold text-lg">Audio Quality Assessment</h3>
+            <p className="text-gray-500 mt-2 text-sm">
+              Analyze WAV loudness, noise, clipping, and silence.
+            </p>
+          </button>
+
+          <button
             onClick={() => navigate("/server-health")}
             className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 text-left hover:shadow-xl hover:-translate-y-1 hover:border-red-500 transition-all duration-300"
           >
@@ -260,23 +291,20 @@ export default function Dashboard() {
           Recent Activity
         </h2>
 
-        <ul className="space-y-4">
-          <li className="border-b pb-3">
-            ✅ Logged in successfully
-          </li>
-
-          <li className="border-b pb-3">
-            📄 Accessed Records
-          </li>
-
-          <li className="border-b pb-3">
-            🔍 Opened Search Module
-          </li>
-
-          <li>
-            👤 Viewed User Dashboard
-          </li>
-        </ul>
+   <ul className="space-y-4">
+  {activities.length === 0 ? (
+    <li className="text-gray-500">
+      No recent activity yet.
+    </li>
+  ) : (
+    activities.map((activity, index) => (
+      <li key={index} className="border-b pb-3">
+        <p className="font-medium">{activity.message}</p>
+        <p className="text-sm text-gray-500">{activity.time}</p>
+      </li>
+    ))
+  )}
+</ul>
       </div>
 
     </div>

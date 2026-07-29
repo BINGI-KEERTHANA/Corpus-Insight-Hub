@@ -1,13 +1,24 @@
+import { addActivity } from "../../utils/activity";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 
 export default function AddRecord() {
   const [title, setTitle] = useState("");
+  const [titleError, setTitleError] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  
+  const [languages] = useState([
+  "English",
+  "Telugu",
+  "Hindi",
+  "Tamil",
+  "Kannada",
+  "Malayalam",
+]);
 
   useEffect(() => {
   const fetchCategories = async () => {
@@ -30,6 +41,10 @@ export default function AddRecord() {
       alert("Please fill all fields.");
       return;
     }
+    if (title.trim().length < 8) {
+  setTitleError("Title must contain at least 8 characters.");
+  return;
+}
 
     try {
       setLoading(true);
@@ -47,6 +62,8 @@ export default function AddRecord() {
   },
   user_id: "27e49c9e-472c-417b-9830-0c53b69654e9",
 });
+      addActivity(`Added record "${title}"`);
+
       alert("Record added successfully!");
 
       setTitle("");
@@ -77,12 +94,27 @@ export default function AddRecord() {
           </label>
 
           <input
-            type="text"
-            className="w-full border rounded-lg p-3"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter title"
-          />
+  type="text"
+  className="w-full border rounded-lg p-3"
+  value={title}
+  onChange={(e) => {
+    const value = e.target.value;
+    setTitle(value);
+
+    if (value.length > 0 && value.length < 8) {
+      setTitleError("Title must contain at least 8 characters.");
+    } else {
+      setTitleError("");
+    }
+  }}
+  placeholder="Enter at least 8 characters"
+/>
+
+{titleError && (
+  <p className="text-red-500 text-sm mt-1">
+    {titleError}
+  </p>
+)}
         </div>
 
         <div>
@@ -104,13 +136,19 @@ export default function AddRecord() {
             Language
           </label>
 
-          <input
-            type="text"
-            className="w-full border rounded-lg p-3"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            placeholder="English"
-          />
+          <select
+  className="w-full border rounded-lg p-3"
+  value={language}
+  onChange={(e) => setLanguage(e.target.value)}
+>
+  <option value="">Select Language</option>
+
+  {languages.map((lang) => (
+    <option key={lang} value={lang}>
+      {lang}
+    </option>
+  ))}
+</select>
         </div>
 
         <div>
