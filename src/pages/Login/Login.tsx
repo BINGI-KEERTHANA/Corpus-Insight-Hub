@@ -42,6 +42,7 @@ export default function Login() {
 	"user_id",
 	response.data.user_id
       );
+      localStorage.setItem("username", response.data.username);
       addActivity("✅ Logged in successfully");
       navigate("/dashboard");
       
