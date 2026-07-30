@@ -5,7 +5,9 @@ import api from "../../services/api";
 export default function AddRecord() {
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
   const [description, setDescription] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,7 +47,10 @@ export default function AddRecord() {
   setTitleError("Title must contain at least 8 characters.");
   return;
 }
-
+if (description.trim().length < 20) {
+  setDescriptionError("Description must contain at least 20 characters.");
+  return;
+}
     try {
       setLoading(true);
 
@@ -64,7 +69,10 @@ export default function AddRecord() {
 });
       addActivity(`Added record "${title}"`);
 
-      alert("Record added successfully!");
+      setSuccessMessage("✅ Record added successfully!");
+      setTimeout(() => {
+  setSuccessMessage("");
+}, 3000);
 
       setTitle("");
       setDescription("");
@@ -88,6 +96,11 @@ export default function AddRecord() {
         onSubmit={handleSubmit}
         className="bg-white shadow rounded-xl p-6 max-w-xl space-y-5"
       >
+        {successMessage && (
+  <div className="bg-green-100 text-green-700 border border-green-400 p-3 rounded-lg">
+    {successMessage}
+  </div>
+)}
         <div>
           <label className="block font-medium mb-2">
             Title
@@ -95,6 +108,7 @@ export default function AddRecord() {
 
           <input
   type="text"
+  required
   className="w-full border rounded-lg p-3"
   value={title}
   onChange={(e) => {
@@ -123,12 +137,31 @@ export default function AddRecord() {
           </label>
 
           <textarea
-            rows={5}
-            className="w-full border rounded-lg p-3"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter description"
-          />
+  rows={5}
+  required
+  className="w-full border rounded-lg p-3"
+  value={description}
+  onChange={(e) => {
+    const value = e.target.value;
+    setDescription(value);
+
+    if (value.length > 0 && value.length < 20) {
+      setDescriptionError("Description must contain at least 20 characters.");
+    } else {
+      setDescriptionError("");
+    }
+  }}
+  placeholder="Enter description"
+/>
+
+{descriptionError && (
+  <p className="text-red-500 text-sm mt-1">
+    {descriptionError}
+  </p>
+)}
+<p className="text-sm text-gray-500 text-right mt-1">
+  {description.length}/500 characters
+</p>
         </div>
 
         <div>
@@ -137,6 +170,7 @@ export default function AddRecord() {
           </label>
 
           <select
+          required
   className="w-full border rounded-lg p-3"
   value={language}
   onChange={(e) => setLanguage(e.target.value)}
@@ -157,6 +191,7 @@ export default function AddRecord() {
           </label>
 
           <select
+          required
   className="w-full border rounded-lg p-3"
   value={category}
   onChange={(e) => setCategory(e.target.value)}
