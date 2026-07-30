@@ -230,9 +230,12 @@ export default function AISummary() {
     try {
       const languageString = targetLang === "TE" ? "telugu" : "english";
 
-      // Direct axios call to local backend (bypasses default API base URL / interceptors)
+      const API_URL =
+        import.meta.env.VITE_BACKEND_URL ||
+        "https://ai-summary-backend-fs46.onrender.com";
+
       const response = await axios.post(
-        "http://127.0.0.1:8000/summarize",
+        `${API_URL}/summarize`,
         {
           text: cleanedText,
           language: languageString,
