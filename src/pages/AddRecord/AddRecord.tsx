@@ -150,6 +150,9 @@ if (description.trim().length < 20) {
     {descriptionError}
   </p>
 )}
+<p className="text-sm text-gray-500 text-right mt-1">
+  {description.length}/500 characters
+</p>
         </div>
 
         <div>
