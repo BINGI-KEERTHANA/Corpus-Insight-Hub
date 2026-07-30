@@ -34,6 +34,16 @@ export default function Login() {
         "access_token",
         response.data.access_token
       );
+      localStorage.setItem(
+	"user_id",
+	response.data.user_id
+      );
+      if(response.data.device_id){
+        localStorage.setItem(
+          "device_id",
+	   response.data.device_id
+	);
+}
       addActivity("✅ Logged in successfully");
       navigate("/dashboard");
       
