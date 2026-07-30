@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 .env
 echo -e "\n__pycache__/\n*.pyc" >> .gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
