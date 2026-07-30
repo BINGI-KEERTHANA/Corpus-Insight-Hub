@@ -40,7 +40,7 @@ export default function Dashboard() {
       try {
         const response = await api.get("/api/v1/auth/me");
         setUser(response.data);
-        const recordsResponse = await api.get("/api/v1/records?limit=10");
+        const recordsResponse = await api.get("/api/v1/records/?limit=10");
         setTotalRecords(recordsResponse.data.length);
         const languagesResponse = await api.get("/api/v1/languages");
         setTotalLanguages(languagesResponse.data.length);

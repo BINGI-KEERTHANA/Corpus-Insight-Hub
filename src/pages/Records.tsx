@@ -21,7 +21,7 @@ export default function Records() {
   useEffect(() => {
     const fetchRecords = async () => {
       try {
-        const recordsResponse = await api.get("/api/v1/records?limit=10");
+        const recordsResponse = await api.get("/api/v1/records/?limit=10");
         setRecords(recordsResponse.data);
       } catch (error) {
         console.error("Failed to fetch records:", error);
