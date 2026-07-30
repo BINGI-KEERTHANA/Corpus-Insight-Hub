@@ -29,6 +29,7 @@ export default function Login() {
         phone,
         password,
       });
+ console.log("LOGIN RESPONSE:",response.data);
 
       localStorage.setItem(
         "access_token",
