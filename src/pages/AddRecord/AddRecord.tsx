@@ -7,6 +7,7 @@ export default function AddRecord() {
   const [titleError, setTitleError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [description, setDescription] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,7 @@ if (description.trim().length < 20) {
 });
       addActivity(`Added record "${title}"`);
 
-      alert("Record added successfully!");
+      setSuccessMessage("✅ Record added successfully!");
 
       setTitle("");
       setDescription("");
@@ -92,6 +93,11 @@ if (description.trim().length < 20) {
         onSubmit={handleSubmit}
         className="bg-white shadow rounded-xl p-6 max-w-xl space-y-5"
       >
+        {successMessage && (
+  <div className="bg-green-100 text-green-700 border border-green-400 p-3 rounded-lg">
+    {successMessage}
+  </div>
+)}
         <div>
           <label className="block font-medium mb-2">
             Title
