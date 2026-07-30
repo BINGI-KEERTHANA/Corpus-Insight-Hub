@@ -70,6 +70,9 @@ if (description.trim().length < 20) {
       addActivity(`Added record "${title}"`);
 
       setSuccessMessage("✅ Record added successfully!");
+      setTimeout(() => {
+  setSuccessMessage("");
+}, 3000);
 
       setTitle("");
       setDescription("");
