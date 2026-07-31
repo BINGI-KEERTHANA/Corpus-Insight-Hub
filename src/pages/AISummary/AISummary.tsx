@@ -23,7 +23,49 @@ interface RecordItem {
   [key: string]: unknown;
 }
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
+// Master topic pool defined outside component to prevent ESLint hook dependency issues
+const TOPIC_POOL = [
+  // --- Programming Languages ---
+  "Python Programming Language",
+  "JavaScript Core Concepts",
+  "TypeScript Type System",
+  "C++ Memory Management & OOP",
+  "Java Virtual Machine & Ecosystem",
+  "Rust Memory Safety & Concurrency",
+  "Go Programming Language",
+  "SQL Database Query Optimization",
+  "PHP Web Development",
+  "Swift iOS Application Development",
+  "Kotlin Android Architecture",
+
+  // --- Linguistics & Corpus Research ---
+  "Global English Accents & Phonetics",
+  "Indian English Pronunciation Patterns",
+  "Telugu Dialectal Variations in Rayalaseema",
+  "Acoustic Phonetics & Vowel Formants",
+  "Spoken Corpus Analysis Methods",
+  "Speech Recognition Dataset Structure",
+  "Natural Language Processing in Multilingual Contexts",
+  "Regional Dialect Mapping in South India",
+  "Phonetic Transcription Standards",
+  "Voice Activity Detection in Audio Corpora",
+  "Hyderabadi Spoken Telugu Corpus",
+  "Bilingual Speech Synthesis Research",
+
+  // --- Computer Science & Technology ---
+  "Artificial Intelligence in Healthcare",
+  "Quantum Computing Principles",
+  "Machine Learning Algorithm Optimization",
+  "Renewable Energy Systems",
+  "Space Exploration and Mars Missions",
+  "Global Climate Change Impact",
+  "Cybersecurity and Data Encryption",
+  "Telugu Literature and Cultural History",
+  "Indian Economy & Digital Banking",
+  "Neuroscience and Human Brain Mapping",
+  "Robotics and Automation Technology",
+  "Computer Vision & Pattern Recognition",
+];
 
 const extractRawString = (item: RecordItem): string => {
   const candidate =
@@ -56,48 +98,77 @@ export default function AISummary() {
   const [loading, setLoading] = useState(true);
   const [summarizing, setSummarizing] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [isCooldown, setIsCooldown] = useState(false);
 
-  // Reusable fetchRecords function to allow manual or event-driven updates
-  const fetchRecords = useCallback(async (signal?: AbortSignal) => {
+  // Helper to attach dynamic shuffled topics to database records
+  const processRecordData = useCallback((rawData: RecordItem[]) => {
+    const shuffledTopics = [...TOPIC_POOL].sort(() => Math.random() - 0.5);
+
+    return rawData.map((record: RecordItem, index: number) => ({
+      ...record,
+      title: `${shuffledTopics[index % shuffledTopics.length]}`,
+    }));
+  }, []);
+
+  // Handler for manual "Refresh List" button clicks
+  const handleRefreshList = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/api/v1/records", { signal });
-      const data = Array.isArray(response.data)
+      const response = await api.get("/api/v1/records");
+      const rawData = Array.isArray(response.data)
         ? response.data
         : response.data.items || [];
 
-      setRecords(data);
-    } catch (error: unknown) {
-      // Safely check if request was aborted/cancelled
-      const isCanceled =
-        axios.isCancel(error) ||
-        (error as { name?: string })?.name === "CanceledError" ||
-        (error as { code?: string })?.code === "ERR_CANCELED";
+      const cleanedData = processRecordData(rawData);
+      setRecords(cleanedData);
 
-      if (!isCanceled) {
-        console.error("Failed to fetch records:", error);
-      }
+      setSelectedRecordUid(""); // Reset selection on manual refresh
+      setText("");
+      setHasSubmitted(false);
+    } catch (error: unknown) {
+      console.error("Failed to refresh records:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
+  // Initial fetch effect on component mount
   useEffect(() => {
     const controller = new AbortController();
 
-    // Initial load on component mount
-    fetchRecords(controller.signal);
+    const loadInitialRecords = async () => {
+      try {
+        const response = await api.get("/api/v1/records", {
+          signal: controller.signal,
+        });
+        const rawData = Array.isArray(response.data)
+          ? response.data
+          : response.data.items || [];
 
-    // Auto refresh list when switching back to this tab/window
-    const onFocus = () => fetchRecords();
-    window.addEventListener("focus", onFocus);
+        const cleanedData = processRecordData(rawData);
+        setRecords(cleanedData);
+      } catch (error: unknown) {
+        const isCanceled =
+          axios.isCancel(error) ||
+          (error as { name?: string })?.name === "CanceledError" ||
+          (error as { code?: string })?.code === "ERR_CANCELED" ||
+          (error as { message?: string })?.message === "canceled" ||
+          (error as { message?: string })?.message === "Request aborted";
+
+        // Suppress initial StrictMode cancellation warnings
+        if (!isCanceled) {
+          console.error("Failed to fetch initial records:", error);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialRecords();
 
     return () => {
       controller.abort();
-      window.removeEventListener("focus", onFocus);
     };
-  }, [fetchRecords]);
+  }, [processRecordData]);
 
   const decodeUnicode = (str: string) => {
     try {
@@ -130,17 +201,9 @@ export default function AISummary() {
     return title.trim();
   };
 
-  const fetchGeminiSummary = async (targetLang: "TE" | "EN") => {
+  // Calls FastAPI Backend Endpoint (/summarize)
+  const fetchBackendSummary = async (targetLang: "TE" | "EN") => {
     if (!selectedRecordUid) return;
-
-    const apiKey = GEMINI_API_KEY.trim();
-    if (!apiKey) {
-      setText(
-        "⚠️ Missing API Key: Please check that VITE_GEMINI_API_KEY is set in your .env file."
-      );
-      setHasSubmitted(true);
-      return;
-    }
 
     const record = records.find((r) => r.uid === selectedRecordUid);
     if (!record) {
@@ -156,135 +219,84 @@ export default function AISummary() {
 
     const cleanedText = cleanTextContent(rawString);
 
-    if (!cleanedText || cleanedText.length < 5) {
-      setText("No valid text content available to generate a summary.");
-      setHasSubmitted(true);
-      return;
-    }
-
     setSummarizing(true);
     setHasSubmitted(true);
+    setText(
+      targetLang === "TE"
+        ? "🤖 సారాంశం తయారు చేయబడుతోంది..."
+        : "🤖 Generating AI summary..."
+    );
 
-    const maxRetries = 3;
-    let attempt = 0;
-    let success = false;
-    const baseDelayMs = 15000; // Wait 5 seconds on first rate limit hit
+    try {
+      const languageString = targetLang === "TE" ? "telugu" : "english";
 
-    while (attempt <= maxRetries && !success) {
-      try {
-        if (attempt === 0) {
-          setText("🤖 Generating AI summary via Gemini 3.6 Flash...");
+      const API_URL =
+        import.meta.env.VITE_BACKEND_URL ||
+        "https://ai-summary-backend-fs46.onrender.com";
+
+      const response = await axios.post(
+        `${API_URL}/summarize`,
+        {
+          text: cleanedText,
+          language: languageString,
+          title: record.title || "Corpus Record",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
+      );
 
-        const languageText = targetLang === "TE" ? "Telugu" : "English";
+      const resData = response.data;
+      let summaryResult = "";
 
-        const prompt = `You are an expert AI summarizer. Please analyze the following corpus record titled "${record.title || "Record"}" and write a clear, natural summary of its main points and meaning. Strictly write the summary in ${languageText}.\n\nRaw Text Content:\n"${cleanedText}"`;
-
-        // Using exactly Gemini 3.6 Flash as requested
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [{ text: prompt }],
-                },
-              ],
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          const status = response.status;
-          const errData = (await response.json().catch(() => ({}))) as {
-            error?: { message?: string };
-          };
-          const errMessage = errData?.error?.message || `API error (${status})`;
-
-          // Trigger automatic retry if we hit Free Tier Rate limit (429)
-          if ((status === 429 || errMessage.toLowerCase().includes("quota")) && attempt < maxRetries) {
-            attempt++;
-            const waitTime = baseDelayMs * Math.pow(1.5, attempt - 1); // Exponential backoff (5s, 7.5s, 11s)
-            setText(
-              `⏳ Rate limit reached. Auto-retrying in ${Math.round(waitTime / 1000)}s... (Attempt ${attempt}/${maxRetries})`
-            );
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
-            continue; // Loop back and try the fetch again
-          }
-
-          throw new Error(errMessage);
-        }
-
-        const result = await response.json();
-        const aiResponse = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (aiResponse) {
-          setText(aiResponse.trim());
-        } else {
-          setText("Unable to parse summary response from Gemini AI.");
-        }
-        
-        success = true; // Mark as successful to break out of the retry loop
-        
-      } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Check network or key settings.";
-
-        // Fallback for network-level drops that register as rate-limiting text
-        if (
-          errorMessage.includes("Quota exceeded") ||
-          errorMessage.includes("429") ||
-          errorMessage.includes("limit")
-        ) {
-          if (attempt < maxRetries) {
-            attempt++;
-            const waitTime = baseDelayMs * Math.pow(1.5, attempt - 1);
-            setText(`⏳ Rate limit reached. Auto-retrying in ${Math.round(waitTime / 1000)}s... (Attempt ${attempt}/${maxRetries})`);
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
-            continue;
-          } else {
-            setText(
-              "⏳ Free Tier Rate Limit Reached. Max auto-retries exceeded. Please wait 30–60 seconds and click 'Get Summary' again."
-            );
-          }
-        } else {
-          setText(`Failed to connect to Gemini AI: ${errorMessage}`);
-        }
-        break; // Unrecoverable error (like a bad API key or no internet), exit loop immediately
+      if (typeof resData?.summary === "string") {
+        summaryResult = resData.summary;
+      } else if (Array.isArray(resData?.summary) && resData.summary.length > 0) {
+        summaryResult =
+          resData.summary[0]?.summary_text || resData.summary[0] || "";
+      } else if (
+        typeof resData?.summary === "object" &&
+        resData?.summary !== null
+      ) {
+        summaryResult =
+          resData.summary.summary_text || JSON.stringify(resData.summary);
+      } else if (typeof resData === "string") {
+        summaryResult = resData;
       }
-    }
 
-    setSummarizing(false);
+      if (summaryResult.trim()) {
+        setText(summaryResult.trim());
+      } else {
+        setText("Unable to parse summary from backend.");
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to connect to backend service.";
+      setText(`Error generating summary: ${errorMessage}`);
+    } finally {
+      setSummarizing(false);
+    }
   };
 
   const handleGetSummaryClick = () => {
-    if (isCooldown || summarizing || !selectedRecordUid) return;
-
-    fetchGeminiSummary(selectedLang);
-
-    // Disable button for 10 seconds after click to protect rate limit quota
-    setIsCooldown(true);
-    setTimeout(() => {
-      setIsCooldown(false);
-    }, 10000);
+    if (summarizing || !selectedRecordUid) return;
+    fetchBackendSummary(selectedLang);
   };
 
   const handleSelectRecord = (uid: string) => {
     setSelectedRecordUid(uid);
-    // Hide previous summary output when choosing a new record
     setHasSubmitted(false);
     setText("");
   };
 
   const handleLanguageToggle = (lang: "TE" | "EN") => {
     setSelectedLang(lang);
-    // Re-generate in the new language if summary is currently visible
-    if (hasSubmitted && selectedRecordUid && !isCooldown) {
-      fetchGeminiSummary(lang);
+    if (selectedRecordUid) {
+      fetchBackendSummary(lang);
     }
   };
 
@@ -299,7 +311,7 @@ export default function AISummary() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">AI Summary</h1>
       <p className="text-gray-500 mt-2">
-        Generate real AI summaries using Google Gemini 3.6 Flash.
+        Generate AI summaries via Hugging Face backend.
       </p>
 
       <div className="bg-white rounded-xl shadow p-6 mt-8">
@@ -307,7 +319,7 @@ export default function AISummary() {
           <label className="block font-semibold">Select Record</label>
           <button
             type="button"
-            onClick={() => fetchRecords()}
+            onClick={handleRefreshList}
             disabled={loading || summarizing}
             className="text-xs text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50 transition"
           >
@@ -366,24 +378,20 @@ export default function AISummary() {
           <button
             type="button"
             onClick={handleGetSummaryClick}
-            disabled={!selectedRecordUid || summarizing || isCooldown}
+            disabled={!selectedRecordUid || summarizing}
             className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium px-5 py-2 rounded-lg text-sm transition shadow"
           >
-            {summarizing
-              ? "Generating..."
-              : isCooldown
-              ? "Wait a few seconds..."
-              : "Get Summary"}
+            {summarizing ? "Generating..." : "Get Summary"}
           </button>
         </div>
 
-        {/* Summary Container: Completely hidden until user clicks 'Get Summary' */}
+        {/* Output Container */}
         {hasSubmitted && (
           <div className="mt-6">
             <div className="flex justify-between items-center mb-2">
               <label className="font-semibold text-gray-800">
                 {summarizing
-                  ? "Gemini AI Generating Summary..."
+                  ? "Generating Summary via Backend..."
                   : "Generated Summary"}
               </label>
 
@@ -402,9 +410,9 @@ export default function AISummary() {
               readOnly
               style={{
                 fontFamily:
-                  "'Roboto', 'Noto Sans Telugu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  "'Noto Sans Telugu', 'Mandali', 'Gautami', 'Roboto', sans-serif",
                 fontSize: "16px",
-                lineHeight: "1.6",
+                lineHeight: "1.8",
               }}
               className="w-full border border-gray-300 rounded-lg p-4 text-gray-900 bg-white focus:outline-none shadow-inner"
             />
